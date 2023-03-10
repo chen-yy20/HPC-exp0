@@ -6,6 +6,14 @@
 
 void pow_a(int *a, int *b, int n, int m, int comm_sz /* 总进程数 */) {
     // TODO: 对这个进程拥有的数据计算 b[i] = a[i]^m
+    int this_n = n/comm_sz;
+    for (int i = 0 ; i < this_n ; ++i){
+        int x = 1;
+        for (int j = 0; j < m; j++){
+            x *= a[i];
+        }
+        b[i] = x;
+    }
 }
 
 int main(int argc, char** argv) {
@@ -29,6 +37,7 @@ int main(int argc, char** argv) {
     int m = atoi(argv[2]);
     int seed = atoi(argv[3]);
     if (n % comm_sz != 0) {
+        // 要求数据总数整除总进程数，否则进程终止
         printf("Invalid parameter: n % comm_sz != 0\n");
         // MPI 系统的终止
         MPI_Finalize();
@@ -55,6 +64,7 @@ int main(int argc, char** argv) {
         root_b = new int[n];
 
         for (int i = 0; i < n; i++)
+        // 数组a的数据是随机生成的
             root_a[i] = rand() % 1024;
     }
 
